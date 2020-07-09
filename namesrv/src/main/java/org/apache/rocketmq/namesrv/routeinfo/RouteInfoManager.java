@@ -418,7 +418,7 @@ public class RouteInfoManager {
         }
 
         log.debug("pickupTopicRouteData {} {}", topic, topicRouteData);
-
+        // 如果找到了对应的broker信息和对应的队列信息，则返回topicRouteData
         if (foundBrokerData && foundQueueData) {
             return topicRouteData;
         }

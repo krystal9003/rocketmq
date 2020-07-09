@@ -28,7 +28,11 @@ public class RequestCode {
     public static final int QUERY_CONSUMER_OFFSET = 14;
     public static final int UPDATE_CONSUMER_OFFSET = 15;
     public static final int UPDATE_AND_CREATE_TOPIC = 17;
+
+    // 获取所有主题的配置信息
     public static final int GET_ALL_TOPIC_CONFIG = 21;
+
+
     public static final int GET_TOPIC_CONFIG_LIST = 22;
 
     public static final int GET_TOPIC_NAME_LIST = 23;
@@ -86,8 +90,10 @@ public class RequestCode {
 
     public static final int DELETE_KV_CONFIG = 102;
 
+    // 注册broker请求
     public static final int REGISTER_BROKER = 103;
 
+    // 注销broker请求
     public static final int UNREGISTER_BROKER = 104;
     public static final int GET_ROUTEINTO_BY_TOPIC = 105;
 

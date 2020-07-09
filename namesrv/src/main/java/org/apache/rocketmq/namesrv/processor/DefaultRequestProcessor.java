@@ -342,7 +342,7 @@ public class DefaultRequestProcessor extends AsyncNettyRequestProcessor implemen
             (GetRouteInfoRequestHeader) request.decodeCommandCustomHeader(GetRouteInfoRequestHeader.class);
 
         TopicRouteData topicRouteData = this.namesrvController.getRouteInfoManager().pickupTopicRouteData(requestHeader.getTopic());
-
+        log.info("对应的topic信息为:{}",requestHeader.getTopic());
         if (topicRouteData != null) {
             if (this.namesrvController.getNamesrvConfig().isOrderMessageEnable()) {
                 String orderTopicConf =
@@ -357,7 +357,7 @@ public class DefaultRequestProcessor extends AsyncNettyRequestProcessor implemen
             response.setRemark(null);
             return response;
         }
-
+        // 如果对应的topic信息不存在，直接返回code ResponseCode.TOPIC_NOT_EXIST
         response.setCode(ResponseCode.TOPIC_NOT_EXIST);
         response.setRemark("No topic route info in name server for the topic: " + requestHeader.getTopic()
             + FAQUrl.suggestTodo(FAQUrl.APPLY_TOPIC_URL));

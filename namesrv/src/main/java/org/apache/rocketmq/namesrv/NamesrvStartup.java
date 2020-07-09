@@ -80,6 +80,7 @@ public class NamesrvStartup {
         }
 
         final NamesrvConfig namesrvConfig = new NamesrvConfig();
+        namesrvConfig.setRocketmqHome("D:\\MyData\\dongwei8\\code\\rocketmq\\distribution");
         final NettyServerConfig nettyServerConfig = new NettyServerConfig();
         nettyServerConfig.setListenPort(9876);
         if (commandLine.hasOption('c')) {

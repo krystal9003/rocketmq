@@ -25,6 +25,7 @@ public class SelectMessageQueueByHash implements MessageQueueSelector {
 
     @Override
     public MessageQueue select(List<MessageQueue> mqs, Message msg, Object arg) {
+        // 针对arg采用获取hash值然后对队列的长度取模
         int value = arg.hashCode();
         if (value < 0) {
             value = Math.abs(value);
