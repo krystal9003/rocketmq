@@ -78,7 +78,29 @@ public class DefaultRequestProcessor extends AsyncNettyRequestProcessor implemen
                 request);
         }
 
-
+        // nameserver提供的请求code
+        /**
+         * 1、RequestCode.PUT_KV_CONFIG
+         * 2、RequestCode.GET_KV_CONFIG
+         * 3、RequestCode.DELETE_KV_CONFIG
+         * 4、RequestCode.QUERY_DATA_VERSION
+         * 5、RequestCode.REGISTER_BROKER
+         * 6、RequestCode.UNREGISTER_BROKER
+         * 7、RequestCode.GET_ROUTEINTO_BY_TOPIC
+         * 8、RequestCode.GET_BROKER_CLUSTER_INFO
+         * 9、RequestCode.WIPE_WRITE_PERM_OF_BROKER
+         * 10、RequestCode.GET_ALL_TOPIC_LIST_FROM_NAMESERVER
+         * 11、RequestCode.DELETE_TOPIC_IN_NAMESRV
+         * 12、RequestCode.GET_KVLIST_BY_NAMESPACE
+         * 13、RequestCode.GET_TOPICS_BY_CLUSTER
+         * 14、RequestCode.GET_SYSTEM_TOPIC_LIST_FROM_NS
+         * 15、RequestCode.GET_UNIT_TOPIC_LIST
+         * 16、RequestCode.GET_HAS_UNIT_SUB_TOPIC_LIST
+         * 17、RequestCode.GET_HAS_UNIT_SUB_UNUNIT_TOPIC_LIST
+         * 18、RequestCode.UPDATE_NAMESRV_CONFIG
+         * 19、RequestCode.GET_NAMESRV_CONFIG
+         * 
+         */
         switch (request.getCode()) {
             case RequestCode.PUT_KV_CONFIG:
                 return this.putKVConfig(ctx, request);
