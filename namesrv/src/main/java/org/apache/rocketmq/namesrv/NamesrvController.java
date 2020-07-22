@@ -157,6 +157,7 @@ public class NamesrvController {
     }
 
     public void start() throws Exception {
+        // 调用NettyRemotingServer中的start方法，暴露对外的服务端口
         this.remotingServer.start();
 
         if (this.fileWatchService != null) {
