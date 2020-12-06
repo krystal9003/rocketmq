@@ -45,6 +45,13 @@ import org.apache.rocketmq.store.MessageExtBrokerInner;
 import org.apache.rocketmq.store.PutMessageResult;
 import org.apache.rocketmq.store.stats.BrokerStatsManager;
 
+/**
+ *
+ *  RequestCode.SEND_REPLY_MESSAGE
+ *  RequestCode.SEND_REPLY_MESSAGE_V2
+ *
+ */
+
 public class ReplyMessageProcessor extends AbstractSendMessageProcessor implements NettyRequestProcessor {
     private static final InternalLogger log = InternalLoggerFactory.getLogger(LoggerName.BROKER_LOGGER_NAME);
 

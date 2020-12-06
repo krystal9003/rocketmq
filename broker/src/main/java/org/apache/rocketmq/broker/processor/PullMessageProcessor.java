@@ -16,6 +16,7 @@
  */
 package org.apache.rocketmq.broker.processor;
 
+import com.alibaba.fastjson.JSON;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -90,11 +91,25 @@ public class PullMessageProcessor extends AsyncNettyRequestProcessor implements 
 
     private RemotingCommand processRequest(final Channel channel, RemotingCommand request, boolean brokerAllowSuspend)
         throws RemotingCommandException {
+        /**
+         * {
+         * 	"commitOffset": 3647,
+         * 	"consumerGroup": "please_rename_unique_group_name_4",
+         * 	"expressionType": "TAG",
+         * 	"maxMsgNums": 32,
+         * 	"queueId": 0,
+         * 	"queueOffset": 3647,
+         * 	"subVersion": 1607156467156,
+         * 	"suspendTimeoutMillis": 15000,
+         * 	"sysFlag": 3,
+         * 	"topic": "%RETRY%please_rename_unique_group_name_4"
+         * }
+         */
         RemotingCommand response = RemotingCommand.createResponseCommand(PullMessageResponseHeader.class);
         final PullMessageResponseHeader responseHeader = (PullMessageResponseHeader) response.readCustomHeader();
         final PullMessageRequestHeader requestHeader =
             (PullMessageRequestHeader) request.decodeCommandCustomHeader(PullMessageRequestHeader.class);
-
+        log.debug("拉取消息的参数为:{}", JSON.toJSONString(requestHeader));
         response.setOpaque(request.getOpaque());
 
         log.debug("receive PullMessage request command, {}", request);

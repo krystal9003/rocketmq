@@ -51,14 +51,6 @@ public class RemotingHelper {
         return sb.toString();
     }
 
-    public static SocketAddress string2SocketAddress(final String addr) {
-        int split = addr.lastIndexOf(":");
-        String host = addr.substring(0, split);
-        String port = addr.substring(split + 1);
-        InetSocketAddress isa = new InetSocketAddress(host, Integer.parseInt(port));
-        return isa;
-    }
-
     public static RemotingCommand invokeSync(final String addr, final RemotingCommand request,
         final long timeoutMillis) throws InterruptedException, RemotingConnectException,
         RemotingSendRequestException, RemotingTimeoutException {

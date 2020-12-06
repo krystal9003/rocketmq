@@ -118,6 +118,7 @@ public class FilterServerManager {
             Entry<Channel, FilterServerInfo> next = it.next();
             long timestamp = next.getValue().getLastUpdateTimestamp();
             Channel channel = next.getKey();
+            // 当系统时间和上次更新时间大于30s的时候，移除对应的channel
             if ((System.currentTimeMillis() - timestamp) > FILTER_SERVER_MAX_IDLE_TIME_MILLS) {
                 log.info("The Filter Server<{}> expired, remove it", next.getKey());
                 it.remove();

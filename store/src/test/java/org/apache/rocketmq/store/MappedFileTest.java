@@ -52,9 +52,9 @@ public class MappedFileTest {
         assertThat(mappedFile.destroy(1000)).isTrue();
     }
 
-    @After
-    public void destory() {
-        File file = new File("target/unit_test_store");
-        UtilAll.deleteFile(file);
-    }
+//    @After
+//    public void destory() {
+//        File file = new File("target/unit_test_store");
+//        UtilAll.deleteFile(file);
+//    }
 }

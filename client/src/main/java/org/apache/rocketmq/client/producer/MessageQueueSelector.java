@@ -21,5 +21,16 @@ import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageQueue;
 
 public interface MessageQueueSelector {
+
+
+    /**
+     * 如果要支持，orderId只存放到一个队列中，可以自定义实现逻辑
+     * @param mqs
+     * @param msg
+     * @param arg
+     * @return
+     */
     MessageQueue select(final List<MessageQueue> mqs, final Message msg, final Object arg);
+
+
 }

@@ -16,12 +16,15 @@
  */
 package org.apache.rocketmq.remoting.netty;
 
+/**
+ * 客户端配置信息
+ */
 public class NettyClientConfig {
     /**
      * Worker thread number
      */
     private int clientWorkerThreads = 4;
-    private int clientCallbackExecutorThreads = Runtime.getRuntime().availableProcessors();
+    private int clientCallbackExecutorThreads = Runtime.getRuntime().availableProcessors(); // cpu核心数
     private int clientOnewaySemaphoreValue = NettySystemConfig.CLIENT_ONEWAY_SEMAPHORE_VALUE;
     private int clientAsyncSemaphoreValue = NettySystemConfig.CLIENT_ASYNC_SEMAPHORE_VALUE;
     private int connectTimeoutMillis = 3000;

@@ -52,6 +52,7 @@ public class HAService {
     private final DefaultMessageStore defaultMessageStore;
 
     private final WaitNotifyObject waitNotifyObject = new WaitNotifyObject();
+    //push2SlaveMaxOffset 参数值 是 slave 与 master 保持一个心跳频率，定时上报给 master，master 再根据这个值判断 slave 落后 master 多少位移量。
     private final AtomicLong push2SlaveMaxOffset = new AtomicLong(0);
 
     private final GroupTransferService groupTransferService;
@@ -77,6 +78,11 @@ public class HAService {
     }
 
     public boolean isSlaveOK(final long masterPutWhere) {
+        //masterPutWhere = result.getWroteOffset() + result.getWroteBytes()，其中 wroteOffset 表示从那个位移开始写入，wroteBytes 表示写入的消息量，
+        // 因此 masterPutWhere 表示 master 最大的消息拉取位移，push2SlaveMaxOffset 表示的是此时 slave 拉取最大的位移，
+        // haSlaveFallbehindMax 表示 slave 主从同步同步复制时最多可落后 master 的位移，
+        // masterPutWhere - this.push2SlaveMaxOffset.get() 即可表示此时 slave 落后 master 的位移量，
+        // 如果大于 haSlaveFallbehindMax，则报 SLAVE_NOT_AVAILABLE 给客户端，不过不用担心，只要 slave 没有挂掉，slave 的同步位移肯定能够追上来
         boolean result = this.connectionCount.get() > 0;
         result =
             result

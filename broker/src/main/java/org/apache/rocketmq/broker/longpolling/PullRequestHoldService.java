@@ -42,6 +42,7 @@ public class PullRequestHoldService extends ServiceThread {
     }
 
     public void suspendPullRequest(final String topic, final int queueId, final PullRequest pullRequest) {
+        //根据主题名称+队列id,获取ManyPullRequest,对于同一个topic+队列的拉取请求用ManyPullRequest包装，然后将pullRequest添加到ManyPullRequest中。
         String key = this.buildKey(topic, queueId);
         ManyPullRequest mpr = this.pullRequestTable.get(key);
         if (null == mpr) {
@@ -69,12 +70,15 @@ public class PullRequestHoldService extends ServiceThread {
         while (!this.isStopped()) {
             try {
                 if (this.brokerController.getBrokerConfig().isLongPollingEnable()) {
+                    // 如果开启了长轮询模式，则每次只挂起5S，然后就去尝试拉取。
                     this.waitForRunning(5 * 1000);
                 } else {
+                    // 如果不开启长轮询模式，则只挂起一次，挂起时间为shortPollingTimeMills，然后去尝试查找消息
                     this.waitForRunning(this.brokerController.getBrokerConfig().getShortPollingTimeMills());
                 }
-
                 long beginLockTimestamp = this.systemClock.now();
+                // 遍历pullRequestTable，如果拉取任务的待拉取偏移量小于当前队列的最大偏移量时执行拉取，
+                // 否则如果没有超过最大等待时间则等待，否则返回未拉取到消息，返回给消息拉取客户端
                 this.checkHoldRequest();
                 long costTime = this.systemClock.now() - beginLockTimestamp;
                 if (costTime > 5 * 1000) {
@@ -99,8 +103,10 @@ public class PullRequestHoldService extends ServiceThread {
             if (2 == kArray.length) {
                 String topic = kArray[0];
                 int queueId = Integer.parseInt(kArray[1]);
+                // 根据主题，消费队列ID查找队列的最大偏移量
                 final long offset = this.brokerController.getMessageStore().getMaxOffsetInQueue(topic, queueId);
                 try {
+                    // 根据该offset，判断是否有新的消息达到
                     this.notifyMessageArriving(topic, queueId, offset);
                 } catch (Throwable e) {
                     log.error("check hold request failed. topic={}, queueId={}", topic, queueId, e);

@@ -43,15 +43,23 @@ import org.apache.rocketmq.srvutil.FileWatchService;
 public class NamesrvController {
     private static final InternalLogger log = InternalLoggerFactory.getLogger(LoggerName.NAMESRV_LOGGER_NAME);
 
+    // Namesrv的配置信息
     private final NamesrvConfig namesrvConfig;
 
+    // 服务配置信息
     private final NettyServerConfig nettyServerConfig;
 
+    // 定时任务线程池
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryImpl(
             "NSScheduledThread"));
+
+    // 没啥参考意义
     private final KVConfigManager kvConfigManager;
+
+    // topic和broker信息管理器
     private final RouteInfoManager routeInfoManager;
 
+    //
     private RemotingServer remotingServer;
 
     private BrokerHousekeepingService brokerHousekeepingService;
@@ -75,14 +83,16 @@ public class NamesrvController {
     }
 
     public boolean initialize() {
-
+        // System.getProperty("user.home") + File.separator + "namesrv" + File.separator + "kvConfig.json" 从这个位置拿到kv数据
         this.kvConfigManager.load();
 
+        // 实例化NettingRemotingServer，
         this.remotingServer = new NettyRemotingServer(this.nettyServerConfig, this.brokerHousekeepingService);
 
         this.remotingExecutor =
                 Executors.newFixedThreadPool(nettyServerConfig.getServerWorkerThreads(), new ThreadFactoryImpl("RemotingExecutorThread_"));
 
+        // 往remotingServer上注册NettyRequestProcessor
         this.registerProcessor();
 
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
@@ -98,6 +108,7 @@ public class NamesrvController {
 
             @Override
             public void run() {
+
                 NamesrvController.this.kvConfigManager.printAllPeriodically();
             }
         }, 1, 10, TimeUnit.MINUTES);

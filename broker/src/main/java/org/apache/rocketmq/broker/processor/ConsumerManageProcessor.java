@@ -38,6 +38,14 @@ import org.apache.rocketmq.remoting.netty.AsyncNettyRequestProcessor;
 import org.apache.rocketmq.remoting.netty.NettyRequestProcessor;
 import org.apache.rocketmq.remoting.protocol.RemotingCommand;
 
+
+/**
+ *
+ *  RequestCode.GET_CONSUMER_LIST_BY_GROUP
+ *  RequestCode.UPDATE_CONSUMER_OFFSET
+ *  RequestCode.QUERY_CONSUMER_OFFSET
+ *
+ */
 public class ConsumerManageProcessor extends AsyncNettyRequestProcessor implements NettyRequestProcessor {
     private static final InternalLogger log = InternalLoggerFactory.getLogger(LoggerName.BROKER_LOGGER_NAME);
 

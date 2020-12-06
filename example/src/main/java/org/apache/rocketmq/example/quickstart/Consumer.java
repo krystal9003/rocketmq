@@ -52,12 +52,13 @@ public class Consumer {
         /*
          * Specify where to start in case the specified consumer group is a brand new one.
          */
+        consumer.setNamesrvAddr("127.0.0.1:9876");
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
 
         /*
          * Subscribe one more more topics to consume.
          */
-        consumer.subscribe("TopicTest", "*");
+        consumer.subscribe("TOPIC_B", "*");
 
         /*
          *  Register callback to execute on arrival of messages fetched from brokers.
@@ -68,6 +69,14 @@ public class Consumer {
             public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs,
                 ConsumeConcurrentlyContext context) {
                 System.out.printf("%s Receive New Messages: %s %n", Thread.currentThread().getName(), msgs);
+                MessageExt messageExt = msgs.get(0);
+                byte[] body = messageExt.getBody();
+                String content = new String(body);
+                String last = content.substring(content.length() - 1);
+                int num = Integer.parseInt(last);
+                if(num % 2 == 0){
+                    return ConsumeConcurrentlyStatus.RECONSUME_LATER;
+                }
                 return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
             }
         });

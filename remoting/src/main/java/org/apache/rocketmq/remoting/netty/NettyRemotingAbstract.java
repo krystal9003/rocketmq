@@ -78,6 +78,7 @@ public abstract class NettyRemotingAbstract {
     /**
      * This container holds all processors per request code, aka, for each incoming request, we may look up the
      * responding processor in this map to handle the request.
+     * 记录requestCode与对应的处理器，线程池之间的关系
      */
     protected final HashMap<Integer/* request code */, Pair<NettyRequestProcessor, ExecutorService>> processorTable =
         new HashMap<Integer, Pair<NettyRequestProcessor, ExecutorService>>(64);
@@ -190,7 +191,9 @@ public abstract class NettyRemotingAbstract {
      * @param cmd request command.
      */
     public void processRequestCommand(final ChannelHandlerContext ctx, final RemotingCommand cmd) {
+        // 根据不同的code找到不同的线程池
         final Pair<NettyRequestProcessor, ExecutorService> matched = this.processorTable.get(cmd.getCode());
+        // 如果没有根据code找到对应的线程池和处理逻辑，那么使用默认的请求处理器来处理
         final Pair<NettyRequestProcessor, ExecutorService> pair = null == matched ? this.defaultRequestProcessor : matched;
         final int opaque = cmd.getOpaque();
 
@@ -270,6 +273,7 @@ public abstract class NettyRemotingAbstract {
                 }
             }
         } else {
+            // 找不到对应的请求处理器，则直接返回错误
             String error = " request type " + cmd.getCode() + " not supported";
             final RemotingCommand response =
                 RemotingCommand.createResponseCommand(RemotingSysResponseCode.REQUEST_CODE_NOT_SUPPORTED, error);
@@ -570,6 +574,7 @@ public abstract class NettyRemotingAbstract {
         private final int maxSize = 10000;
 
         public void putNettyEvent(final NettyEvent event) {
+            // 当eventQueue里面的数量大于10000个的时候，直接抛弃event
             if (this.eventQueue.size() <= maxSize) {
                 this.eventQueue.add(event);
             } else {

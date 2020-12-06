@@ -54,6 +54,17 @@ public class BrokerStartup {
     public static String configFile = null;
     public static InternalLogger log;
 
+
+    /**
+     * 目前测试环境配置信息
+     * /apps/svr/jdk1.8.0_231/bin/java -server -Xms1g -Xmx1g -Xmn512m -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:G1ReservePercent=25 -XX:InitiatingHeapOccupancyPercent=30
+     * -XX:SoftRefLRUPolicyMSPerMB=0 -verbose:gc -Xloggc:/dev/shm/mq_gc_%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -XX:+PrintAdaptiveSizePolicy
+     * -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=30m -XX:-OmitStackTraceInFastThrow -XX:+AlwaysPreTouch -XX:MaxDirectMemorySize=15g -XX:-UseLargePages -XX:-UseBiasedLocking
+     * -Djava.ext.dirs=/apps/svr/jdk1.8.0_231/jre/lib/ext:/apps/svr/rocketmq-all-4.4.0-bin-release/bin/../lib -cp .:/apps/svr/rocketmq-all-4.4.0-bin-release/bin/../conf:.:/apps/svr/jdk1.8.0_231/jre/lib/rt.jar:/apps/svr/jdk1.8.0_231/lib/dt.jar:/apps/svr/jdk1.8.0_231/lib/tools.jar
+     * org.apache.rocketmq.broker.BrokerStartup -c conf/2m-2s-sync/broker-a.properties
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         start(createBrokerController(args));
     }
@@ -64,7 +75,7 @@ public class BrokerStartup {
             controller.start();
 
             String tip = "The broker[" + controller.getBrokerConfig().getBrokerName() + ", "
-                + controller.getBrokerAddr() + "] boot success. serializeType=" + RemotingCommand.getSerializeTypeConfigInThisServer();
+                    + controller.getBrokerAddr() + "] boot success. serializeType=" + RemotingCommand.getSerializeTypeConfigInThisServer();
 
             if (null != controller.getBrokerConfig().getNamesrvAddr()) {
                 tip += " and name server is " + controller.getBrokerConfig().getNamesrvAddr();
@@ -101,8 +112,9 @@ public class BrokerStartup {
         try {
             //PackageConflictDetect.detectFastjson();
             Options options = ServerUtil.buildCommandlineOptions(new Options());
+            // 获取命令行的配置信息
             commandLine = ServerUtil.parseCmdLine("mqbroker", args, buildCommandlineOptions(options),
-                new PosixParser());
+                    new PosixParser());
             if (null == commandLine) {
                 System.exit(-1);
             }
@@ -113,10 +125,11 @@ public class BrokerStartup {
             final NettyClientConfig nettyClientConfig = new NettyClientConfig();
 
             nettyClientConfig.setUseTLS(Boolean.parseBoolean(System.getProperty(TLS_ENABLE,
-                String.valueOf(TlsSystemConfig.tlsMode == TlsMode.ENFORCING))));
-            nettyServerConfig.setListenPort(10911);
+                    String.valueOf(TlsSystemConfig.tlsMode == TlsMode.ENFORCING))));
+            nettyServerConfig.setListenPort(10911); // 服务器端监听10911端口（默认端口）
             final MessageStoreConfig messageStoreConfig = new MessageStoreConfig();
 
+            // 这里判断messageStoreConfig.getBrokerRole()好像没啥意义
             if (BrokerRole.SLAVE == messageStoreConfig.getBrokerRole()) {
                 int ratio = messageStoreConfig.getAccessMessageInMemoryMaxRatio() - 10;
                 messageStoreConfig.setAccessMessageInMemoryMaxRatio(ratio);
@@ -129,12 +142,20 @@ public class BrokerStartup {
                     InputStream in = new BufferedInputStream(new FileInputStream(file));
                     properties = new Properties();
                     properties.load(in);
-
+                    //  brokerClusterName=DefaultCluster
+                    //  brokerName=broker-a
+                    //  brokerId=0
+                    //  deleteWhen=04
+                    //  fileReservedTime=48
+                    //  brokerRole=SYNC_MASTER
+                    //  flushDiskType=ASYNC_FLUSH
                     properties2SystemEnv(properties);
-                    MixAll.properties2Object(properties, brokerConfig);
+
+                    // 拿到配置文件放到对应的配置中
+                    MixAll.properties2Object(properties, brokerConfig);   // brokerId brokerName brokerClusterName
                     MixAll.properties2Object(properties, nettyServerConfig);
                     MixAll.properties2Object(properties, nettyClientConfig);
-                    MixAll.properties2Object(properties, messageStoreConfig);
+                    MixAll.properties2Object(properties, messageStoreConfig); // deleteWhen flushDiskType fileReservedTime brokerRole
 
                     BrokerPathConfigHelper.setBrokerConfigPath(file);
                     in.close();
@@ -157,8 +178,8 @@ public class BrokerStartup {
                     }
                 } catch (Exception e) {
                     System.out.printf(
-                        "The Name Server Address[%s] illegal, please set it as follows, \"127.0.0.1:9876;192.168.0.1:9876\"%n",
-                        namesrvAddr);
+                            "The Name Server Address[%s] illegal, please set it as follows, \"127.0.0.1:9876;192.168.0.1:9876\"%n",
+                            namesrvAddr);
                     System.exit(-3);
                 }
             }
@@ -213,13 +234,14 @@ public class BrokerStartup {
             MixAll.printObjectProperties(log, messageStoreConfig);
 
             final BrokerController controller = new BrokerController(
-                brokerConfig,
-                nettyServerConfig,
-                nettyClientConfig,
-                messageStoreConfig);
+                    brokerConfig,
+                    nettyServerConfig,
+                    nettyClientConfig,
+                    messageStoreConfig);
             // remember all configs to prevent discard
             controller.getConfiguration().registerConfig(properties);
 
+            // controller初始化
             boolean initResult = controller.initialize();
             if (!initResult) {
                 controller.shutdown();

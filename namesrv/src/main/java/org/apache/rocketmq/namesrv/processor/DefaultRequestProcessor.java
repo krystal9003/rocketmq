@@ -83,9 +83,9 @@ public class DefaultRequestProcessor extends AsyncNettyRequestProcessor implemen
          * 1、RequestCode.PUT_KV_CONFIG
          * 2、RequestCode.GET_KV_CONFIG
          * 3、RequestCode.DELETE_KV_CONFIG
-         * 4、RequestCode.QUERY_DATA_VERSION
-         * 5、RequestCode.REGISTER_BROKER
-         * 6、RequestCode.UNREGISTER_BROKER
+         * 4、RequestCode.QUERY_DATA_VERSION         broker调用nameserver
+         * 5、RequestCode.REGISTER_BROKER            broker调用nameserver
+         * 6、RequestCode.UNREGISTER_BROKER          broker调用nameserver
          * 7、RequestCode.GET_ROUTEINTO_BY_TOPIC
          * 8、RequestCode.GET_BROKER_CLUSTER_INFO
          * 9、RequestCode.WIPE_WRITE_PERM_OF_BROKER

@@ -36,9 +36,11 @@ public class MessageExt extends Message {
     private long queueOffset;
     private int sysFlag;
     private long bornTimestamp;
+    // 消息产生端(producer)地址(address:port)
     private SocketAddress bornHost;
 
     private long storeTimestamp;
+    // 消息存储到broker的地址(address:port)
     private SocketAddress storeHost;
     private String msgId;
     private long commitLogOffset;
