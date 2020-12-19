@@ -554,6 +554,20 @@ public class BrokerController {
     }
 
     public void registerProcessor() {
+
+        /**
+         * 往map中注册一个接口的请求code key:RequestCode value:<NettyRequestProcessor,线程池>
+         * 1、RequestCode.SEND_MESSAGE
+         * 2、RequestCode.SEND_MESSAGE_V2
+         * 3、RequestCode.SEND_BATCH_MESSAGE
+         * 4、RequestCode.CONSUMER_SEND_MSG_BACK
+         *
+         * 5、RequestCode.PULL_MESSAGE
+         *
+         *
+         * 6、RequestCode.SEND_REPLY_MESSAGE
+         * 7、RequestCode.SEND_REPLY_MESSAGE_V2
+         */
         /**
          * SendMessageProcessor
          */
@@ -599,6 +613,9 @@ public class BrokerController {
 
         /**
          * ClientManageProcessor
+         * 1、RequestCode.HEART_BEAT 客户端会发送心跳给broker
+         * 2、RequestCode.UNREGISTER_CLIENT
+         * 3、RequestCode.CHECK_CLIENT_CONFIG
          */
         ClientManageProcessor clientProcessor = new ClientManageProcessor(this);
         this.remotingServer.registerProcessor(RequestCode.HEART_BEAT, clientProcessor, this.heartbeatExecutor);
@@ -610,7 +627,10 @@ public class BrokerController {
         this.fastRemotingServer.registerProcessor(RequestCode.CHECK_CLIENT_CONFIG, clientProcessor, this.clientManageExecutor);
 
         /**
-         * ConsumerManageProcessor
+         * ConsumerManageProcessor 消费者管理的处理类
+         * 1、RequestCode.GET_CONSUMER_LIST_BY_GROUP 根据消费者组去查询消费信息
+         * 2、RequestCode.UPDATE_CONSUMER_OFFSET 更新consumeQueue
+         * 3、RequestCode.QUERY_CONSUMER_OFFSET  查询consumeQueue
          */
         ConsumerManageProcessor consumerManageProcessor = new ConsumerManageProcessor(this);
         this.remotingServer.registerProcessor(RequestCode.GET_CONSUMER_LIST_BY_GROUP, consumerManageProcessor, this.consumerManageExecutor);

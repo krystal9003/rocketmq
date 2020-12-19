@@ -117,7 +117,7 @@ public class TopicConfigManager extends ConfigManager {
         }
         {
             // MixAll.OFFSET_MOVED_EVENT
-            String topic = MixAll.OFFSET_MOVED_EVENT;
+            String topic = MixAll.OFFSET_MOVED_EVENT; // OFFSET_MOVED_EVENT
             TopicConfig topicConfig = new TopicConfig(topic);
             this.systemTopicList.add(topic);
             topicConfig.setReadQueueNums(1);

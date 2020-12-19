@@ -558,6 +558,7 @@ public class NettyRemotingClient extends NettyRemotingAbstract implements Remoti
     @Override
     public void registerProcessor(int requestCode, NettyRequestProcessor processor, ExecutorService executor) {
         ExecutorService executorThis = executor;
+        // 如果注册的processor没有线程池的话，那么使用默认的线程池
         if (null == executor) {
             executorThis = this.publicExecutor;
         }

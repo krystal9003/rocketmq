@@ -76,11 +76,13 @@ public class PullAPIWrapper {
             ByteBuffer byteBuffer = ByteBuffer.wrap(pullResultExt.getMessageBinary());
             List<MessageExt> msgList = MessageDecoder.decodes(byteBuffer);
 
+            // consumer端消息过滤
             List<MessageExt> msgListFilterAgain = msgList;
             if (!subscriptionData.getTagsSet().isEmpty() && !subscriptionData.isClassFilterMode()) {
                 msgListFilterAgain = new ArrayList<MessageExt>(msgList.size());
                 for (MessageExt msg : msgList) {
                     if (msg.getTags() != null) {
+                        // 根据tag值进行过滤
                         if (subscriptionData.getTagsSet().contains(msg.getTags())) {
                             msgListFilterAgain.add(msg);
                         }
@@ -140,6 +142,26 @@ public class PullAPIWrapper {
         }
     }
 
+    /**
+
+     * @param mq                            从哪个消息消费队列拉取消息
+     * @param subExpression                 消息过滤表达式
+     * @param expressionType                消息表达式类型
+     * @param subVersion
+     * @param offset                        消息拉取偏移量
+     * @param maxNums                       本次拉取最大消息条数，默认32条
+     * @param sysFlag                       拉取系统标记
+     * @param commitOffset                  当前MessageQueue的消费进度（内存中）
+     * @param brokerSuspendMaxTimeMillis    消息拉取过程中允许Broker挂起时间。默认15秒
+     * @param timeoutMillis                 消息拉取超时时间
+     * @param communicationMode             消息拉取模式，默认为异步拉取
+     * @param pullCallback                  从Broker拉取到消息后的回调方法。
+     * @return
+     * @throws MQClientException
+     * @throws RemotingException
+     * @throws MQBrokerException
+     * @throws InterruptedException
+     */
     public PullResult pullKernelImpl(
         final MessageQueue mq,
         final String subExpression,

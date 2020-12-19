@@ -60,8 +60,7 @@ public class ClientManageProcessor extends AsyncNettyRequestProcessor implements
 
     @Override
     public RemotingCommand processRequest(ChannelHandlerContext ctx, RemotingCommand request)
-        throws RemotingCommandException {
-        switch (request.getCode()) {
+        throws RemotingCommandException {switch (request.getCode()) {
             case RequestCode.HEART_BEAT:
                 return this.heartBeat(ctx, request);
             case RequestCode.UNREGISTER_CLIENT:
@@ -100,6 +99,7 @@ public class ClientManageProcessor extends AsyncNettyRequestProcessor implements
                 if (data.isUnitMode()) {
                     topicSysFlag = TopicSysFlag.buildSysFlag(false, true);
                 }
+                // 创建%RETRY%开头的topic信息，只有topic被订阅之后才会创建对应的重试topic
                 String newTopic = MixAll.getRetryTopic(data.getGroupName());
                 this.brokerController.getTopicConfigManager().createTopicInSendMessageBackMethod(
                     newTopic,

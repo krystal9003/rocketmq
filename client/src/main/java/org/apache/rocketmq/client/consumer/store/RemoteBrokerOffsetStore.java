@@ -43,6 +43,7 @@ public class RemoteBrokerOffsetStore implements OffsetStore {
     private final static InternalLogger log = ClientLogger.getLog();
     private final MQClientInstance mQClientFactory;
     private final String groupName;
+    // 值为消费的偏移量
     private ConcurrentMap<MessageQueue, AtomicLong> offsetTable =
         new ConcurrentHashMap<MessageQueue, AtomicLong>();
 
@@ -77,8 +78,8 @@ public class RemoteBrokerOffsetStore implements OffsetStore {
     public long readOffset(final MessageQueue mq, final ReadOffsetType type) {
         if (mq != null) {
             switch (type) {
-                case MEMORY_FIRST_THEN_STORE:
-                case READ_FROM_MEMORY: {
+                case MEMORY_FIRST_THEN_STORE: // 先从内存中读取，如果内存中不存在，再尝试从磁盘中读取
+                case READ_FROM_MEMORY: {      // 从内存中读取
                     AtomicLong offset = this.offsetTable.get(mq);
                     if (offset != null) {
                         return offset.get();
@@ -86,7 +87,7 @@ public class RemoteBrokerOffsetStore implements OffsetStore {
                         return -1;
                     }
                 }
-                case READ_FROM_STORE: {
+                case READ_FROM_STORE: { // 从磁盘中读取
                     try {
                         long brokerOffset = this.fetchConsumeOffsetFromBroker(mq);
                         AtomicLong offset = new AtomicLong(brokerOffset);

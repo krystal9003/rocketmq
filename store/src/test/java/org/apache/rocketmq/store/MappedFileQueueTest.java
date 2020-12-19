@@ -20,7 +20,10 @@ package org.apache.rocketmq.store;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+
 import org.apache.rocketmq.common.UtilAll;
+import org.apache.rocketmq.common.message.MessageDecoder;
+import org.apache.rocketmq.common.message.MessageExt;
 import org.junit.After;
 import org.junit.Test;
 
@@ -32,7 +35,7 @@ public class MappedFileQueueTest {
         final String fixedMsg = "0123456789abcdef";
 
         MappedFileQueue mappedFileQueue =
-            new MappedFileQueue("target/unit_test_store/a/", 1024, null);
+                new MappedFileQueue("target/unit_test_store/a/", 1024, null);
 
         for (int i = 0; i < 1024; i++) {
             MappedFile mappedFile = mappedFileQueue.getLastMappedFile(0);
@@ -50,7 +53,7 @@ public class MappedFileQueueTest {
         final String fixedMsg = "abcd";
 
         MappedFileQueue mappedFileQueue =
-            new MappedFileQueue("target/unit_test_store/b/", 1024, null);
+                new MappedFileQueue("target/unit_test_store/b/", 1024, null);
 
         for (int i = 0; i < 1024; i++) {
             MappedFile mappedFile = mappedFileQueue.getLastMappedFile(0);
@@ -98,7 +101,7 @@ public class MappedFileQueueTest {
     @Test
     public void testFindMappedFileByOffset_StartOffsetIsNonZero() {
         MappedFileQueue mappedFileQueue =
-            new MappedFileQueue("target/unit_test_store/b/", 1024, null);
+                new MappedFileQueue("target/unit_test_store/b/", 1024, null);
 
         //Start from a non-zero offset
         MappedFile mappedFile = mappedFileQueue.getLastMappedFile(1024);
@@ -122,7 +125,7 @@ public class MappedFileQueueTest {
         final String fixedMsg = "0123456789abcdef";
 
         MappedFileQueue mappedFileQueue =
-            new MappedFileQueue("target/unit_test_store/c/", 1024, null);
+                new MappedFileQueue("target/unit_test_store/c/", 1024, null);
 
         for (int i = 0; i < 1024; i++) {
             MappedFile mappedFile = mappedFileQueue.getLastMappedFile(0);
@@ -157,7 +160,7 @@ public class MappedFileQueueTest {
         final String fixedMsg = "abcd";
 
         MappedFileQueue mappedFileQueue =
-            new MappedFileQueue("target/unit_test_store/d/", 1024, null);
+                new MappedFileQueue("target/unit_test_store/d/", 1024, null);
 
         for (int i = 0; i < 1024; i++) {
             MappedFile mappedFile = mappedFileQueue.getLastMappedFile(0);
@@ -173,7 +176,7 @@ public class MappedFileQueueTest {
     @Test
     public void testDeleteExpiredFileByOffset() {
         MappedFileQueue mappedFileQueue =
-            new MappedFileQueue("target/unit_test_store/e", 5120, null);
+                new MappedFileQueue("target/unit_test_store/e", 5120, null);
 
         for (int i = 0; i < 2048; i++) {
             MappedFile mappedFile = mappedFileQueue.getLastMappedFile(0);
@@ -205,7 +208,7 @@ public class MappedFileQueueTest {
     @Test
     public void testDeleteExpiredFileByTime() throws Exception {
         MappedFileQueue mappedFileQueue =
-            new MappedFileQueue("target/unit_test_store/f/", 1024, null);
+                new MappedFileQueue("target/unit_test_store/f/", 1024, null);
 
         for (int i = 0; i < 100; i++) {
             MappedFile mappedFile = mappedFileQueue.getLastMappedFile(0);
@@ -215,15 +218,15 @@ public class MappedFileQueueTest {
         }
 
         assertThat(mappedFileQueue.getMappedFiles().size()).isEqualTo(50);
-        long expiredTime =  100 * 1000;
+        long expiredTime = 100 * 1000;
         for (int i = 0; i < mappedFileQueue.getMappedFiles().size(); i++) {
             MappedFile mappedFile = mappedFileQueue.getMappedFiles().get(i);
-           if (i < 5) {
-               mappedFile.getFile().setLastModified(System.currentTimeMillis() - expiredTime * 2);
-           }
-           if (i > 20) {
-               mappedFile.getFile().setLastModified(System.currentTimeMillis() - expiredTime * 2);
-           }
+            if (i < 5) {
+                mappedFile.getFile().setLastModified(System.currentTimeMillis() - expiredTime * 2);
+            }
+            if (i > 20) {
+                mappedFile.getFile().setLastModified(System.currentTimeMillis() - expiredTime * 2);
+            }
         }
         mappedFileQueue.deleteExpiredFileByTime(expiredTime, 0, 0, false);
         assertThat(mappedFileQueue.getMappedFiles().size()).isEqualTo(45);
@@ -232,8 +235,8 @@ public class MappedFileQueueTest {
     @Test
     public void testFindMappedFile_ByIteration() {
         MappedFileQueue mappedFileQueue =
-            new MappedFileQueue("target/unit_test_store/g/", 1024, null);
-        for (int i =0 ; i < 3; i++) {
+                new MappedFileQueue("target/unit_test_store/g/", 1024, null);
+        for (int i = 0; i < 3; i++) {
             MappedFile mappedFile = mappedFileQueue.getLastMappedFile(1024 * i);
             mappedFile.wrotePosition.set(1024);
         }
@@ -251,5 +254,26 @@ public class MappedFileQueueTest {
     public void destory() {
         File file = new File("target/unit_test_store");
         UtilAll.deleteFile(file);
+    }
+
+
+    @Test
+    public void getMessageByOffset() {
+        String consumeQueuePath = "D:\\MyData\\dongwei8\\store\\commitlog";
+        int mappedFileSize = 10 * 1024;
+        MappedFileQueue mappedFileQueue = new MappedFileQueue(consumeQueuePath, mappedFileSize, null);
+        mappedFileQueue.load();
+        MappedFile lastMappedFile = mappedFileQueue.getLastMappedFile();
+        int offset = 1848562;
+        int size = 176;
+        MappedFile mappedFile = mappedFileQueue.findMappedFileByOffset(offset, offset == 0);
+        if (mappedFile != null) {
+            int pos = (int) (offset % mappedFileSize);
+            SelectMappedBufferResult selectMappedBufferResult = mappedFile.selectMappedBuffer(pos, size);
+            ByteBuffer byteBuffer = selectMappedBufferResult.getByteBuffer();
+            MessageExt decode = MessageDecoder.decode(byteBuffer);
+            assert decode != null;
+        }
+        assert lastMappedFile != null;
     }
 }

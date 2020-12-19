@@ -78,6 +78,7 @@ public class ExpressionMessageFilter implements MessageFilter {
                 return true;
             }
 
+            // 过滤时候使用
             return subscriptionData.getCodeSet().contains(tagsCode.intValue());
         } else {
             // no expression or no bloom

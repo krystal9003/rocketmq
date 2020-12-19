@@ -394,7 +394,8 @@ public abstract class RebalanceImpl {
             }
         }
 
-        this.dispatchPullRequest(pullRequestList);
+        //  分发pullRequest请求到PullServiceThread线程中执行拉取消息的操作
+       this.dispatchPullRequest(pullRequestList);
 
         return changed;
     }

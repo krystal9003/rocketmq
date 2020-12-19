@@ -186,6 +186,7 @@ public class DefaultMessageStore implements MessageStore {
             log.info("last shutdown {}", lastExitOK ? "normally" : "abnormally");
 
             if (null != scheduleMessageService) {
+                // load delayOffset.json
                 result = result && this.scheduleMessageService.load();
             }
 

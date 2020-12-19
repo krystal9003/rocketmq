@@ -16,6 +16,7 @@
  */
 package org.apache.rocketmq.broker.client;
 
+import com.alibaba.fastjson.JSON;
 import io.netty.channel.Channel;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -147,6 +148,59 @@ public class ConsumerManager {
             Entry<String, ConsumerGroupInfo> next = it.next();
             String group = next.getKey();
             ConsumerGroupInfo consumerGroupInfo = next.getValue();
+            String consumerGroupInfoJson = JSON.toJSONString(consumerGroupInfo);
+            /**
+             * {
+             * 	"allChannel": [
+             *                {
+             * 			"active": true,
+             * 			"inputShutdown": false,
+             * 			"open": true,
+             * 			"outputShutdown": false,
+             * 			"registered": true,
+             * 			"writable": true
+             *        }
+             * 	],
+             * 	"allClientId": [
+             * 		"169.254.185.161@2492"
+             * 	],
+             * 	"channelInfoTable": {
+             * 		"clientId": "169.254.185.161@2492",
+             * 		"language": "JAVA",
+             * 		"lastUpdateTimestamp": 1608046271646,
+             * 		"version": 353* 	},
+             * 	"consumeFromWhere": "CONSUME_FROM_FIRST_OFFSET",
+             * 	"consumeType": "CONSUME_PASSIVELY",
+             * 	"groupName": "please_rename_unique_group_name_4",
+             * 	"lastUpdateTimestamp": 1608046271646,
+             * 	"messageModel": "CLUSTERING",
+             * 	"subscribeTopics": [
+             * 		"%RETRY%please_rename_unique_group_name_4",
+             * 		"TopicTest"
+             * 	],
+             * 	"subscriptionTable": {
+             * 		"%RETRY%please_rename_unique_group_name_4": {
+             * 			"classFilterMode": false,
+             * 			"codeSet": [],
+             * 			"expressionType": "TAG",
+             * 			"subString": "*",
+             * 			"subVersion": 1608046121008,
+             * 			"tagsSet": [],
+             * 			"topic": "%RETRY%please_rename_unique_group_name_4"
+             * 		},
+             * 		"TopicTest": {
+             * 			"classFilterMode": false,
+             * 			"codeSet": [],
+             * 			"expressionType": "TAG",
+             * 			"subString": "*",
+             * 			"subVersion": 1608046121035,
+             * 			"tagsSet": [],
+             * 			"topic": "TopicTest"
+             * 		}
+             * 	}
+             * }
+             */
+            System.out.println(consumerGroupInfoJson);
             ConcurrentMap<Channel, ClientChannelInfo> channelInfoTable =
                 consumerGroupInfo.getChannelInfoTable();
 

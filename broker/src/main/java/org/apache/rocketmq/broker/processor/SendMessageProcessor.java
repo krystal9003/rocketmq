@@ -147,6 +147,7 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
             return CompletableFuture.completedFuture(response);
         }
 
+        // 根据消费组的名字前面添加%RETRY%组成新的topic名字
         String newTopic = MixAll.getRetryTopic(requestHeader.getGroup());
         int queueIdInt = Math.abs(this.random.nextInt() % 99999999) % subscriptionGroupConfig.getRetryQueueNums();
         int topicSysFlag = 0;
@@ -154,6 +155,7 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
             topicSysFlag = TopicSysFlag.buildSysFlag(false, true);
         }
 
+        // 创建newTopic信息
         TopicConfig topicConfig = this.brokerController.getTopicConfigManager().createTopicInSendMessageBackMethod(
                 newTopic,
                 subscriptionGroupConfig.getRetryQueueNums(),
@@ -169,6 +171,9 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
             response.setRemark(String.format("the topic[%s] sending message is forbidden", newTopic));
             return CompletableFuture.completedFuture(response);
         }
+        /**
+         * 通过offset获取原消息的数据
+         */
         MessageExt msgExt = this.brokerController.getMessageStore().lookMessageByOffset(requestHeader.getOffset());
         if (null == msgExt) {
             response.setCode(ResponseCode.SYSTEM_ERROR);
@@ -176,8 +181,10 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
             return CompletableFuture.completedFuture(response);
         }
 
+        // 获取消息中的properties属性中是否有RETRY_TOPIC属性，如果有证明该消息已经重试过了，如果没有则将RETRY_TOPIC的值置为原TOPIC
         final String retryTopic = msgExt.getProperty(MessageConst.PROPERTY_RETRY_TOPIC);
         if (null == retryTopic) {
+            // 将原来的topic放到properties属性中，key命名为RETRY_TOPIC
             MessageAccessor.putProperty(msgExt, MessageConst.PROPERTY_RETRY_TOPIC, msgExt.getTopic());
         }
         msgExt.setWaitStoreMsgOK(false);
@@ -191,6 +198,8 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
 
         if (msgExt.getReconsumeTimes() >= maxReconsumeTimes
                 || delayLevel < 0) {
+            // 如果消息消费的次数大于最大消费次数或者delayLevel小于0的时候，将topic投递到死信队列中
+            // 私信队列topic名称%DLQ%+消费组名
             newTopic = MixAll.getDLQTopic(requestHeader.getGroup());
             queueIdInt = Math.abs(this.random.nextInt() % 99999999) % DLQ_NUMS_PER_GROUP;
 
@@ -203,6 +212,7 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
                 return CompletableFuture.completedFuture(response);
             }
         } else {
+            // 重置delayTimeLevel
             if (0 == delayLevel) {
                 delayLevel = 3 + msgExt.getReconsumeTimes();
             }
@@ -232,6 +242,7 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
                 switch (r.getPutMessageStatus()) {
                     case PUT_OK:
                         String backTopic = msgExt.getTopic();
+                        // 获取真实的topic名，然后统计相关的topic数据信息
                         String correctTopic = msgExt.getProperty(MessageConst.PROPERTY_RETRY_TOPIC);
                         if (correctTopic != null) {
                             backTopic = correctTopic;

@@ -109,7 +109,6 @@ public class PullMessageProcessor extends AsyncNettyRequestProcessor implements 
         final PullMessageResponseHeader responseHeader = (PullMessageResponseHeader) response.readCustomHeader();
         final PullMessageRequestHeader requestHeader =
             (PullMessageRequestHeader) request.decodeCommandCustomHeader(PullMessageRequestHeader.class);
-        log.debug("拉取消息的参数为:{}", JSON.toJSONString(requestHeader));
         response.setOpaque(request.getOpaque());
 
         log.debug("receive PullMessage request command, {}", request);
