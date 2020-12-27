@@ -871,6 +871,12 @@ public class MQClientInstance {
         }
     }
 
+    /**
+     * 使用group作为key，注册MQConsumerInner
+     * @param group
+     * @param consumer
+     * @return
+     */
     public boolean registerConsumer(final String group, final MQConsumerInner consumer) {
         if (null == group || null == consumer) {
             return false;
@@ -977,6 +983,7 @@ public class MQClientInstance {
     }
 
     public void doRebalance() {
+        // 针对每个消费组都进行重新负载的计划
         for (Map.Entry<String, MQConsumerInner> entry : this.consumerTable.entrySet()) {
             MQConsumerInner impl = entry.getValue();
             if (impl != null) {
