@@ -237,6 +237,7 @@ public class RouteInfoManager {
             // 没有找到对应的topic信息，添加到map中去
             queueDataList = new LinkedList<QueueData>();
             queueDataList.add(queueData);
+            // 主题队列中添加主题信息
             this.topicQueueTable.put(topicConfig.getTopicName(), queueDataList);
             log.info("new topic registered, {} {}", topicConfig.getTopicName(), queueData);
         } else {

@@ -120,7 +120,7 @@ public class BrokerStartup {
             }
 
             final BrokerConfig brokerConfig = new BrokerConfig();
-            brokerConfig.setRocketmqHome("D:\\MyData\\dongwei8\\code\\rocketmq\\distribution");
+            brokerConfig.setRocketmqHome("D:\\learning\\rocketmq\\distribution");
             final NettyServerConfig nettyServerConfig = new NettyServerConfig();
             final NettyClientConfig nettyClientConfig = new NettyClientConfig();
 
@@ -174,6 +174,7 @@ public class BrokerStartup {
                 try {
                     String[] addrArray = namesrvAddr.split(";");
                     for (String addr : addrArray) {
+                        // 可以关注下这里发生了什么事件
                         RemotingUtil.string2SocketAddress(addr);
                     }
                 } catch (Exception e) {

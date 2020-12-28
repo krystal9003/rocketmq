@@ -142,8 +142,10 @@ public class DefaultRequestProcessor extends AsyncNettyRequestProcessor implemen
             case RequestCode.GET_HAS_UNIT_SUB_UNUNIT_TOPIC_LIST:
                 return this.getHasUnitSubUnUnitTopicList(ctx, request);
             case RequestCode.UPDATE_NAMESRV_CONFIG:
+                // 更新配置
                 return this.updateConfig(ctx, request);
             case RequestCode.GET_NAMESRV_CONFIG:
+                // 获取配置
                 return this.getConfig(ctx, request);
             default:
                 break;
